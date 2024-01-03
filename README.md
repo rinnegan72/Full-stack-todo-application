@@ -6,7 +6,7 @@ you can add new tasks with task titles, descriptions, due dates and completion s
 ![WhatsApp Image 2024-01-03 at 20 27 44_e59784dc](https://github.com/rinnegan72/Full-stack-todo-application/assets/69243366/4286bc7e-d800-4e8f-98d0-2155c5dbab1d)
 
 # Adonis back-end
-navigate to adonis-todo and use the following
+navigate to adonis-todo and use the following, 
 This is the fullstack boilerplate for AdonisJs, it comes pre-configured with.
 
 1. Bodyparser
@@ -38,7 +38,7 @@ adonis migration:run
 ```
 
 # React front end
-navigate to react-todo and use the following
+navigate to react-todo and use the following, 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## Available Scripts
