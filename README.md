@@ -1,9 +1,12 @@
 # Task LIst
 
 This is a full stack application that implements a todo application and uses all the CRUD operations to work.
-you can add new tasks with task titles, descriptions, due dates and completion status
+you can add new tasks with task titles, descriptions, due dates and completion status.
 
 ![WhatsApp Image 2024-01-03 at 20 27 44_e59784dc](https://github.com/rinnegan72/Full-stack-todo-application/assets/69243366/4286bc7e-d800-4e8f-98d0-2155c5dbab1d)
+
+this is a full stack application made using React as the front-end, AdonisJS as the back-end and MySQL is the database
+
 
 # Adonis back-end
 navigate to adonis-todo and use the following, 
