@@ -13,6 +13,7 @@ const TaskList = () => {
     const [newTaskTitle, setNewTaskTitle] = useState('');
     const [newTaskDescription, setNewTaskDescription] = useState('');
     const [newDueDate, setNewDueDate] = useState(null);
+    const [newCompleted, setNewCompleted] = useState(false);
     const [editedTask, setEditedTask] = useState({ title: '', description: '', due_date: '' });
     // Added state for new task description
 
@@ -33,6 +34,7 @@ const TaskList = () => {
 
     const handleCheckboxChange = async (taskId, completed) => {
         try {
+            console.log("in check box change");
             const response = await axios.put(`http://localhost:3333/tasks/${taskId}`, {
                 completed: !completed,
             });
@@ -53,9 +55,11 @@ const TaskList = () => {
             await axios.post(
                 'http://localhost:3333/tasks',
                 {
-                    title: newTaskTitle || 'New Task',
+                    title: newTaskTitle,
+                    //title: newTaskTitle || 'New Task',
                     description: newTaskDescription, // Use the state for new task description
-                    due_date: newDueDate
+                    due_date: newDueDate,
+                    completed: newCompleted
                 },
                 {
                     headers: {
@@ -71,6 +75,8 @@ const TaskList = () => {
             // Optionally, clear the input fields
             setNewTaskTitle('');
             setNewTaskDescription('');
+            setNewDueDate('');
+            setNewCompleted(false);
             console.log('New task added successfully!');
         } catch (error) {
             console.error('Error adding new task:', error);
@@ -94,12 +100,13 @@ const TaskList = () => {
         setEditedTask({ title: taskToEdit.title, description: taskToEdit.description });
         setEditTaskId(taskId);
     };
-    const handleUpdateTask = async (taskId, updatedTitle, updatedDescription, updatedDueDate) => {
+    const handleUpdateTask = async (taskId, updatedTitle, updatedDescription, updatedDueDate, updatedComplete) => {
         try {
             const response = await axios.put(`http://localhost:3333/tasks/${taskId}`, {
                 description: updatedDescription,
                 title: updatedTitle,
-                due_date: updatedDueDate
+                due_date: updatedDueDate,
+                completed: updatedComplete
             });
             console.log(response);
             console.log('title: ', updatedTitle, ' date: ', updatedDueDate);
@@ -144,7 +151,7 @@ const TaskList = () => {
                                             onChange={(e) => setEditedTask({ ...editedTask, title: e.target.value })}
                                         />
                                         <Button
-                                            onClick={() => handleUpdateTask(task.id, editedTask.title, editedTask.description, editedTask.due_date)}
+                                            onClick={() => handleUpdateTask(task.id, editedTask.title, editedTask.description, editedTask.due_date, editTaskId.completed)}
                                         >
                                             Update
                                         </Button>
@@ -231,7 +238,7 @@ const TaskList = () => {
                             />
                         </td>
                         <td>
-                            <input type="checkbox" />
+                            <input type="checkbox" value={newCompleted} onChange={(e) => setNewCompleted(e.target.checked)} />
                         </td>
                         <td>
                             <svg

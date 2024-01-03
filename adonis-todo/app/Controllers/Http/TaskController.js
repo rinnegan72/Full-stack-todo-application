@@ -3,29 +3,33 @@
 'use strict'
 
 const Task = use('App/Models/Task')
-const { validate } = use('Validator')
 
 class TaskController {
   async create({ request, response }) {
-    const { title, due_date } = request.all();
-    const rules = {
-      title: 'required',
-      due_date: 'date',
-    };
+    try {
+      console.log('Creating a new task');
+      const { title, description, due_date, completed } = request.all();
 
-    const validation = await validate(request.all(), rules);
-
-    if (validation.fails()) {
-      return response.badRequest(validation.messages());
-    }
+        // Check if title is null or empty
+        if (!title) {
+          console.log('Title is null or empty');
+        
+          return response.status(400).json({ error: 'Title cannot be null or empty' });
+        }
 
     const task = await Task.create({
       title,
+      description,
+      due_date,
       completed: false, // You can set the default completion status as needed
     });
 
     return task;
+  } catch (error) {
+    return response.status(500).json({ error: 'Internal Server Error' });
   }
+  }
+
   async index ({ response }) {
     const tasks = await Task.all()
     return response.json(tasks)
