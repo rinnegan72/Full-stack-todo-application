@@ -16,5 +16,5 @@
 /** @type {typeof import('@adonisjs/framework/src/Route/Manager')} */
 const Route = use('Route')
 Route.resource('tasks', 'TaskController').apiOnly()
-Route.post('tasks', 'TaskController.create'); 
+Route.post('tasks', 'TaskController.create').validator('Title')
 Route.on('/').render('welcome')

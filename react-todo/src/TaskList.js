@@ -14,6 +14,8 @@ const TaskList = () => {
     const [newTaskDescription, setNewTaskDescription] = useState('');
     const [newDueDate, setNewDueDate] = useState(null);
     const [newCompleted, setNewCompleted] = useState(false);
+    const [titleValidationError, setTitleValidationError] = useState('');
+    const [dueDateValidationError, setDueDateValidationError] = useState('');
     const [editedTask, setEditedTask] = useState({ title: '', description: '', due_date: '' });
     // Added state for new task description
 
@@ -48,9 +50,38 @@ const TaskList = () => {
             console.error('Error updating task:', error);
         }
     };
+    // Function to check if a date string is valid
+    const isValidDate = (dateString) => {
+          // Allow empty string
+  if (dateString === '') {
+    return true;
+  }
+  if (dateString === 'dd-mm-yyyy') {
+    return true;
+  }
+        const regex = /^\d{4}-\d{2}-\d{2}$/;
+        return regex.test(dateString) && !isNaN(Date.parse(dateString));
+    };
 
     const handleTestButtonClick = async () => {
         try {
+            // Validate the title
+            if (!newTaskTitle.trim()) {
+                setTitleValidationError('Title cannot be empty');
+                console.log("test button click, empty title");
+                return;
+            }
+            console.log("due date is ",newDueDate);
+            // Validate the due date
+            if (newDueDate && !isValidDate(newDueDate)) {
+                setDueDateValidationError('Invalid due date');
+                return;
+            }
+
+            // Clear any previous validation errors
+            setTitleValidationError('');
+            setDueDateValidationError('');
+
             // Make a POST request to create a new task
             await axios.post(
                 'http://localhost:3333/tasks',
@@ -59,7 +90,7 @@ const TaskList = () => {
                     //title: newTaskTitle || 'New Task',
                     description: newTaskDescription, // Use the state for new task description
                     due_date: newDueDate,
-                    completed: newCompleted
+                    completed: newCompleted,
                 },
                 {
                     headers: {
@@ -71,12 +102,18 @@ const TaskList = () => {
             // Fetch and update the task list after adding a new task
             const response = await axios.get('http://localhost:3333/tasks');
             setTasks(response.data);
+            console.log("before resetting ", newCompleted);
 
             // Optionally, clear the input fields
             setNewTaskTitle('');
             setNewTaskDescription('');
             setNewDueDate('');
-            setNewCompleted(false);
+            setNewCompleted(prevCompleted => {
+                // Use the previous state to ensure you're working with the latest state
+                console.log("before resetting in setnewcompleted", prevCompleted);
+                return false;
+            });
+            console.log("after resetting ", newCompleted);
             console.log('New task added successfully!');
         } catch (error) {
             console.error('Error adding new task:', error);
@@ -97,7 +134,7 @@ const TaskList = () => {
         const taskToEdit = tasks.find((task) => task.id === taskId);
 
         // Set the editedTask based on the task to be edited
-        setEditedTask({ title: taskToEdit.title, description: taskToEdit.description });
+        setEditedTask({ title: taskToEdit.title, description: taskToEdit.description, due_date: taskToEdit.due_date, completed: taskToEdit.completed});
         setEditTaskId(taskId);
     };
     const handleUpdateTask = async (taskId, updatedTitle, updatedDescription, updatedDueDate, updatedComplete) => {
@@ -123,7 +160,8 @@ const TaskList = () => {
     };
 
     const isEditing = (taskId) => editTaskId === taskId;
-
+    console.log("date : ",editedTask.due_date);
+                            
     return (
         <div>
             <h1>Task List</h1>
@@ -148,8 +186,10 @@ const TaskList = () => {
                                         <input
                                             type="text"
                                             value={editedTask.title}
-                                            onChange={(e) => setEditedTask({ ...editedTask, title: e.target.value })}
+                                            onChange={(e) => setEditedTask({ ...editedTask, title: e.target.value })
+                                            }
                                         />
+                                        {titleValidationError && <div>{titleValidationError}</div>}
                                         <Button
                                             onClick={() => handleUpdateTask(task.id, editedTask.title, editedTask.description, editedTask.due_date, editTaskId.completed)}
                                         >
@@ -160,27 +200,34 @@ const TaskList = () => {
                                     task.title
                                 )}
                             </td>
-                                <td>
-                                    {isEditing(task.id) ? (
-                                        <input
-                                            type="text"
-                                            value={editedTask.description}
-                                            onChange={(e) => setEditedTask({ ...editedTask, description: e.target.value })}
-                                        />
-                                    ) : (
-                                        task.description
-                                    )}
-                                </td>
                             <td>
                                 {isEditing(task.id) ? (
+                                    
+                                    <input
+                                        type="text"
+                                        value={editedTask.description}
+                                        onChange={(e) => setEditedTask({ ...editedTask, description: e.target.value })}
+                                    />
+                                ) : (
+                                    task.description
+                                )}
+                            </td>
+                            <td>       
+                                {
+                               
+                               isEditing(task.id) ? (
+                                                                            
+                                                                            
+                                                                            
                                     <input
                                         type="date"
                                         value={editedTask.due_date}
                                         onChange={(e) => setEditedTask({ ...editedTask, due_date: e.target.value })}
                                     />
+                                   
                                 ) : (
                                     // Display formatted date if available
-                                    task.due_date ? new Date(task.due_date).toLocaleDateString() : ''
+                                    task.due_date ? new Date(task.due_date).toLocaleDateString().split('T')[0] : ''
                                 )}
                             </td>
                             <td>
@@ -222,6 +269,8 @@ const TaskList = () => {
                                 value={newTaskTitle}
                                 onChange={(e) => setNewTaskTitle(e.target.value)}
                             />
+                            {titleValidationError && <div>{titleValidationError}</div>}
+
                         </td>
                         <td>
                             <input
@@ -236,9 +285,13 @@ const TaskList = () => {
                                 value={newDueDate}
                                 onChange={(e) => setNewDueDate(e.target.value)}
                             />
+                            {dueDateValidationError && <div>{dueDateValidationError}</div>}
+
                         </td>
                         <td>
-                            <input type="checkbox" value={newCompleted} onChange={(e) => setNewCompleted(e.target.checked)} />
+                            <input type="checkbox"
+                                checked={newCompleted} //sriram changed from value to checked
+                                onChange={(e) => setNewCompleted(e.target.checked)} />
                         </td>
                         <td>
                             <svg
