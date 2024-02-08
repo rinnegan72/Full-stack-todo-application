@@ -1,0 +1,25 @@
+service: adonis-worker
+
+frameworkVersion: '3'
+
+provider:
+  name: cloudflare
+  config:
+    accountId: 7cd22c145a82fbfe637fe022897a443d
+    apiKey: 12fe608709ecd4f0b13fa6d0fe49d60b8202c
+    email: sriram@vananam.com
+
+plugins:
+  - serverless-cloudflare-workers
+
+functions:
+  hello:
+    name: hello
+    script: helloWorld # there must be a file called helloWorld.js
+    events:
+      - http:
+          url: https://applicants-boston-journalists-street.trycloudflare.com/
+          method: GET
+          headers:
+            foo: bar
+            x-client-data: value
