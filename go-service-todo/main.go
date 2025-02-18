@@ -12,9 +12,10 @@ import (
 	"log"
 	"net/http"
 	"os"
-
+    "fmt"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/gorilla/mux"
+    "github.com/joho/godotenv"
 )
 
 type Task struct {
@@ -53,9 +54,22 @@ func getTasks(w http.ResponseWriter, r *http.Request) {
     json.NewEncoder(w).Encode(tasks)
 }
 func main() {
+    // Load environment variables from .env file
+    err := godotenv.Load()
+    if err != nil {
+        log.Fatal("Error loading .env file")
+    }
     // Initialize database connection
-    var err error
-    db, err = sql.Open("mysql", "$MYSQL_USER:$MYSQL_PASSWORD@tcp($MYSQL_HOST:$MYSQL_PORT)/$MYSQL_DB")
+    print("service up and running\n")
+    print("port:",os.Getenv("PORT"),"\n")
+    print("mysql username:",os.Getenv("MYSQL_USER"),"\n")
+    print("mysql port:",os.Getenv("MYSQL_PORT"),"\n")
+    db, err = sql.Open("mysql", fmt.Sprintf("%s:%s@tcp(%s:%s)/%s", 
+    os.Getenv("MYSQL_USER"), 
+    os.Getenv("MYSQL_PASSWORD"), 
+    os.Getenv("MYSQL_HOST"), 
+    os.Getenv("MYSQL_PORT"), 
+    os.Getenv("MYSQL_DB")))
     if err != nil {
         log.Fatal(err)
     }
